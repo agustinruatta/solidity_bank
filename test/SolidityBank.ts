@@ -28,7 +28,7 @@ describe("SolidityBank", function () {
         it("Should throw an error if customer is not enrolled", async function () {
             const {solidityBankContract} = await loadFixture(deployEmptyContract);
 
-            await expect(solidityBankContract.getBalance('0xb794f5ea0ba39494ce839613fffba74279579268')).to.be.revertedWith('Customer is not enrolled');
+            await expect(solidityBankContract.getBalance()).to.be.revertedWith('Customer is not enrolled');
         });
     });
 

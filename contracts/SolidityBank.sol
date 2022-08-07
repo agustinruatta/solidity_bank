@@ -9,8 +9,8 @@ contract SolidityBank {
 
     mapping (address => Customer) customers;
 
-    function getBalance(address _address) public view returns (uint256) {
-        require(customers[_address].enrolled, 'Customer is not enrolled');
+    function getBalance() public view returns (uint256) {
+        require(customers[msg.sender].enrolled, 'Customer is not enrolled');
 
         return 0;
     }
