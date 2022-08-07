@@ -40,5 +40,15 @@ describe("SolidityBank", function () {
         });
     });
 
+    describe("enroll", function () {
+        it("Should enroll user", async function () {
+            const {solidityBankContract} = await loadFixture(deployEmptyContract);
+
+            await solidityBankContract.enroll();
+
+            expect(await solidityBankContract.amIEnrolled()).to.be.true;
+        });
+    });
+
     
 });
