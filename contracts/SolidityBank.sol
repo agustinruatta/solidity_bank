@@ -14,4 +14,8 @@ contract SolidityBank {
 
         return 0;
     }
+
+    function amIEnrolled() public view returns (bool) {
+        return customers[msg.sender].enrolled;
+    }
 }

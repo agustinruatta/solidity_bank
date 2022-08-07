@@ -25,10 +25,18 @@ describe("SolidityBank", function () {
     });
 
     describe("getBalance", function () {
-        it("Should throw an error if customer is not enrolled", async function () {
+        it("Should revert if customer is not enrolled", async function () {
             const {solidityBankContract} = await loadFixture(deployEmptyContract);
 
             await expect(solidityBankContract.getBalance()).to.be.revertedWith('Customer is not enrolled');
+        });
+    });
+
+    describe("amIEnrolled", function () {
+        it("Should return false for non enrolled customer", async function () {
+            const {solidityBankContract} = await loadFixture(deployEmptyContract);
+
+            expect(await solidityBankContract.amIEnrolled()).to.be.false;
         });
     });
 
