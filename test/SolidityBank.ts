@@ -48,7 +48,25 @@ describe("SolidityBank", function () {
 
             expect(await solidityBankContract.amIEnrolled()).to.be.true;
         });
-    });
+    });    
 
-    
+    describe("deposit", function () {
+        it("Should revert if customer is not enrolled", async function () {
+            const {solidityBankContract} = await loadFixture(deployEmptyContract);
+
+            await expect(solidityBankContract.deposit()).to.be.revertedWith('Customer is not enrolled');
+        });
+
+        it("Should add to balance", async function () {
+            const {solidityBankContract} = await loadFixture(deployEmptyContract);
+
+            solidityBankContract.enroll();
+
+            const balance = ethers.utils.parseEther("1");
+
+            await solidityBankContract.deposit({value: balance});
+
+            expect(await solidityBankContract.getBalance()).to.be.equal(balance);
+        });
+    });    
 });
