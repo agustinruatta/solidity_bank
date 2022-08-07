@@ -9,9 +9,12 @@ contract SolidityBank {
 
     mapping (address => Customer) customers;
 
-    function getBalance() public view returns (uint256) {
+    modifier assertEnrolled {
         require(customers[msg.sender].enrolled, 'Customer is not enrolled');
+        _;
+    }
 
+    function getBalance() public assertEnrolled view returns (uint256) {
         return customers[msg.sender].balance;
     }
 
@@ -23,9 +26,7 @@ contract SolidityBank {
         customers[msg.sender].enrolled = true;
     }
 
-    function deposit() public payable {
-        require(customers[msg.sender].enrolled, 'Customer is not enrolled');
-
+    function deposit() public assertEnrolled payable {
         customers[msg.sender].balance += msg.value;
     }
 }
