@@ -4,6 +4,8 @@ import { ethers } from "hardhat";
 
 describe("SolidityBank", function () {
     const ONE_ETHER = ethers.utils.parseEther("1");
+    const CONTRACT_BALANCE = ONE_ETHER;
+    const HALF_CONTRACT_BALANCE = ethers.utils.parseEther("0.5");
 
     async function deployEmptyContract() {
         const SolidityBank = await ethers.getContractFactory('SolidityBank');
@@ -85,21 +87,21 @@ describe("SolidityBank", function () {
         it("Should not withdraw more than available", async function () {
             const {solidityBankContract} = await loadFixture(deployContractWithOneDepositedEther);
 
-            await expect(solidityBankContract.withdraw(ONE_ETHER.add("1"))).to.be.revertedWith('Can not withdraw more than available balance');
+            await expect(solidityBankContract.withdraw(CONTRACT_BALANCE.add(1))).to.be.revertedWith('Can not withdraw more than available balance');
         });
 
-        it("withdraws all balance should set balance to 0", async function () {
+        it("withdraws half balance should set balance to half", async function () {
             const {solidityBankContract} = await loadFixture(deployContractWithOneDepositedEther);
             
-            await solidityBankContract.withdraw(ONE_ETHER);
+            await solidityBankContract.withdraw(HALF_CONTRACT_BALANCE);
 
-            expect(await solidityBankContract.getBalance()).to.be.equal(0);
+            expect(await solidityBankContract.getBalance()).to.be.equal(HALF_CONTRACT_BALANCE);
         });
 
-        it("withdraws all balance should send ethers to owner account", async function () {
+        it("withdraws half balance should send ethers to owner account", async function () {
             const {solidityBankContract, owner} = await loadFixture(deployContractWithOneDepositedEther);
 
-            await expect(await solidityBankContract.withdraw(ONE_ETHER)).to.changeEtherBalances([solidityBankContract, owner], [ONE_ETHER.mul(-1), ONE_ETHER]);
+            await expect(await solidityBankContract.withdraw(HALF_CONTRACT_BALANCE)).to.changeEtherBalances([solidityBankContract, owner], [HALF_CONTRACT_BALANCE.mul(-1), HALF_CONTRACT_BALANCE]);
         });
     });    
 });
