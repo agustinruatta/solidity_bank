@@ -103,5 +103,27 @@ describe("SolidityBank", function () {
 
             await expect(await solidityBankContract.withdraw(HALF_CONTRACT_BALANCE)).to.changeEtherBalances([solidityBankContract, owner], [HALF_CONTRACT_BALANCE.mul(-1), HALF_CONTRACT_BALANCE]);
         });
-    });    
+    });
+
+    describe("withdrawAll", function () {
+        it("Should revert if customer is not enrolled", async function () {
+            const {solidityBankContract} = await loadFixture(deployEmptyContract);
+
+            await expect(solidityBankContract.withdrawAll()).to.be.revertedWith('Customer is not enrolled');
+        });
+
+        it("withdraws all balance should set balance to 0", async function () {
+            const {solidityBankContract} = await loadFixture(deployContractWithOneDepositedEther);
+            
+            await solidityBankContract.withdrawAll();
+
+            expect(await solidityBankContract.getBalance()).to.be.equal(0);
+        });
+
+        it("withdraws half balance should send ethers to owner account", async function () {
+            const {solidityBankContract, owner} = await loadFixture(deployContractWithOneDepositedEther);
+
+            await expect(await solidityBankContract.withdrawAll()).to.changeEtherBalances([solidityBankContract, owner], [CONTRACT_BALANCE.mul(-1), CONTRACT_BALANCE]);
+        });
+    });   
 });

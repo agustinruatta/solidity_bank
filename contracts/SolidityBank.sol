@@ -37,4 +37,8 @@ contract SolidityBank {
 
         msg.sender.call{value: _amount}("");
     }
+
+    function withdrawAll() public {
+        withdraw(customers[msg.sender].balance);
+    }
 }
