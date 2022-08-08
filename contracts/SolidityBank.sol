@@ -30,7 +30,9 @@ contract SolidityBank {
         customers[msg.sender].balance += msg.value;
     }
 
-    function withdraw(uint256 amount) public assertEnrolled {
-        require(amount <= customers[msg.sender].balance, 'Can not withdraw more than available balance');
+    function withdraw(uint256 _amount) public assertEnrolled {
+        require(_amount <= customers[msg.sender].balance, 'Can not withdraw more than available balance');
+
+        customers[msg.sender].balance -= _amount;
     }
 }

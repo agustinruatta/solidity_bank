@@ -85,9 +85,15 @@ describe("SolidityBank", function () {
         it("Should not withdraw more than available", async function () {
             const {solidityBankContract, owner} = await loadFixture(deployContractWithOneDepositedEther);
 
-            const previousBalance = await owner.getBalance();
+            await expect(solidityBankContract.withdraw(ONE_ETHER.add("1"))).to.be.revertedWith('Can not withdraw more than available balance');
+        });
 
-            await expect(solidityBankContract.withdraw(previousBalance.add("1"))).to.be.revertedWith('Can not withdraw more than available balance');
+        it("withdraws all balance should set balance to 0", async function () {
+            const {solidityBankContract, owner} = await loadFixture(deployContractWithOneDepositedEther);
+            
+            await solidityBankContract.withdraw(ONE_ETHER);
+
+            expect(await solidityBankContract.getBalance()).to.be.equal(0);
         });
     });    
 });
