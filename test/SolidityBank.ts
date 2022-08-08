@@ -3,17 +3,24 @@ import { expect } from "chai";
 import { ethers } from "hardhat";
 
 describe("SolidityBank", function () {
-    // We define a fixture to reuse the same setup in every test.
-    // We use loadFixture to run this setup once, snapshot that state,
-    // and reset Hardhat Network to that snapshopt in every test.
-    async function deployEmptyContract() {
-        // Contracts are deployed using the first signer/account by default
-        const [owner, otherAccount] = await ethers.getSigners();
+    const ONE_ETHER = ethers.utils.parseEther("1");
 
+    async function deployEmptyContract() {
         const SolidityBank = await ethers.getContractFactory('SolidityBank');
         const solidityBankContract = await SolidityBank.deploy();
 
         return { solidityBankContract };
+    }
+
+    async function deployContractWithOneDepositedEther() {
+        const {solidityBankContract} = await deployEmptyContract();
+
+        await solidityBankContract.enroll();
+        await solidityBankContract.deposit({value: ONE_ETHER});
+
+        const [owner] = await ethers.getSigners();
+
+        return { solidityBankContract, owner };
     }
 
     describe("Deployment", function () {
@@ -62,11 +69,25 @@ describe("SolidityBank", function () {
 
             solidityBankContract.enroll();
 
-            const balance = ethers.utils.parseEther("1");
+            await solidityBankContract.deposit({value: ONE_ETHER});
 
-            await solidityBankContract.deposit({value: balance});
+            expect(await solidityBankContract.getBalance()).to.be.equal(ONE_ETHER);
+        });
+    });
 
-            expect(await solidityBankContract.getBalance()).to.be.equal(balance);
+    describe("withdraw", function () {
+        it("Should revert if customer is not enrolled", async function () {
+            const {solidityBankContract} = await loadFixture(deployEmptyContract);
+
+            await expect(solidityBankContract.withdraw(1)).to.be.revertedWith('Customer is not enrolled');
+        });
+
+        it("Should not withdraw more than available", async function () {
+            const {solidityBankContract, owner} = await loadFixture(deployContractWithOneDepositedEther);
+
+            const previousBalance = await owner.getBalance();
+
+            await expect(solidityBankContract.withdraw(previousBalance.add("1"))).to.be.revertedWith('Can not withdraw more than available balance');
         });
     });    
 });
