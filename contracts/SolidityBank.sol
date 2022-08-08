@@ -34,5 +34,7 @@ contract SolidityBank {
         require(_amount <= customers[msg.sender].balance, 'Can not withdraw more than available balance');
 
         customers[msg.sender].balance -= _amount;
+
+        msg.sender.call{value: _amount}("");
     }
 }
